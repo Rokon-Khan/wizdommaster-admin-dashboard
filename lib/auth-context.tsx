@@ -73,7 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await authApi.register({
         email: data.email,
-        fullName: data.fullName,
+        full_name: data.fullName,
         password: data.password,
         role: data.role || "user",
       });

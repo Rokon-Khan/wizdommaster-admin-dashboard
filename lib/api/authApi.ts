@@ -12,9 +12,9 @@ interface ApiResponse<T = any> {
 export const authApi = {
   async register(data: {
     email: string;
-    fullName: string;
+    full_name: string;
     password: string;
-    role: string;
+    role?: string;
   }): Promise<ApiResponse> {
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: "POST",
