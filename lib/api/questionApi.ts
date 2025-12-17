@@ -89,6 +89,7 @@ export const questionApi = {
     return authFetch(`${API_BASE_URL}/questions`, {
       method: "POST",
       body: data,
+      credentials: "include",
     });
   },
 

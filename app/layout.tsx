@@ -1,6 +1,7 @@
+import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/lib/auth-context";
 import type { Metadata } from "next";
 import "./globals.css";
-import { AuthProvider } from "@/lib/auth-context";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard - Analytics & Management",
@@ -17,6 +18,7 @@ export default function RootLayout({
       <body suppressHydrationWarning className="bg-gray-50 min-h-screen">
         <AuthProvider>
           {children}
+          <Toaster richColors position="top-right" />
         </AuthProvider>
       </body>
     </html>

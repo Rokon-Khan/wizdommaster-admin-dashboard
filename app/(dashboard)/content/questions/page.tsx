@@ -3,14 +3,18 @@
 import { DataTable } from "@/components/shared/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Question, questionApi } from "@/lib/api/questionApi";
+import { questionApi } from "@/lib/api/questionApi";
+import { Question } from "@/lib/types";
 import { Edit, Eye, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function QuestionsPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -52,15 +56,32 @@ export default function QuestionsPage() {
   };
 
   const handleView = (id: string) => {
-    console.log("View question:", id);
+    router.push(`/content/questions/${id}`);
   };
 
   const handleEdit = (id: string) => {
-    console.log("Edit question:", id);
+    router.push(`/content/questions/${id}/edit`);
   };
 
-  const handleDelete = (id: string) => {
-    console.log("Delete question:", id);
+  const handleDelete = async (id: string) => {
+    if (
+      confirm(
+        "Are you sure you want to delete this question? This action cannot be undone."
+      )
+    ) {
+      try {
+        const response = await questionApi.deleteQuestion(id);
+        if (response.success) {
+          toast.success("Question deleted successfully!");
+          fetchQuestions();
+        } else {
+          toast.error(response.message || "Failed to delete question");
+        }
+      } catch (error) {
+        console.error("Failed to delete question:", error);
+        toast.error("Failed to delete question");
+      }
+    }
   };
 
   const getQuestionTypeColor = (type: string) => {
@@ -167,12 +188,12 @@ export default function QuestionsPage() {
             Manage quiz questions and answers
           </p>
         </div>
-        <Link href="/content/questions/create">
-          <Button>
+        <Button asChild>
+          <Link href="/content/questions/create">
             <Plus className="h-4 w-4 mr-2" />
             Add Question
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </div>
 
       <DataTable

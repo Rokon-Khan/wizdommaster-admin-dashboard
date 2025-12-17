@@ -1,4 +1,11 @@
-import { ApiResponse, PaginatedResponse, User, Category, Quiz, Question, Analytics } from '../types';
+import {
+  Analytics,
+  ApiResponse,
+  Category,
+  PaginatedResponse,
+  Quiz,
+  User,
+} from "../types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -137,6 +144,7 @@ export const adminApi = {
     return authFetch(`${API_BASE_URL}/admin/funfacts`, {
       method: "POST",
       body: data,
+      credentials: "include",
     });
   },
 
