@@ -7,11 +7,13 @@ import { adminApi } from "@/lib/api/adminApi";
 import { Quiz } from "@/lib/types";
 import { Edit, Eye, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function QuizzesPage() {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -53,15 +55,28 @@ export default function QuizzesPage() {
   };
 
   const handleView = (id: string) => {
-    console.log("View quiz:", id);
+    router.push(`/content/quizzes/${id}`);
   };
 
   const handleEdit = (id: string) => {
-    console.log("Edit quiz:", id);
+    router.push(`/content/quizzes/${id}/edit`);
   };
 
-  const handleDelete = (id: string) => {
-    console.log("Delete quiz:", id);
+  const handleDelete = async (id: string) => {
+    if (
+      confirm(
+        "Are you sure you want to delete this quiz? This action cannot be undone."
+      )
+    ) {
+      try {
+        const response = await adminApi.deleteQuiz(id);
+        if (response.success) {
+          fetchQuizzes();
+        }
+      } catch (error) {
+        console.error("Failed to delete quiz:", error);
+      }
+    }
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -176,12 +191,12 @@ export default function QuizzesPage() {
             Manage quiz content and settings
           </p>
         </div>
-        <Link href="/content/create">
-          <Button>
+        <Button asChild>
+          <Link href="/content/quizzes/create">
             <Plus className="h-4 w-4 mr-2" />
             Create Quiz
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </div>
 
       <DataTable

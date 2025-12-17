@@ -7,11 +7,13 @@ import { adminApi } from "@/lib/api/adminApi";
 import { Category } from "@/lib/types";
 import { ArrowLeft, Edit, Eye, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -50,22 +52,22 @@ export default function CategoriesPage() {
   };
 
   const handleView = (id: string) => {
-    window.open(`/content/categories/${id}`, '_blank');
+    router.push(`/content/categories/${id}`);
   };
 
   const handleEdit = (id: string) => {
-    window.open(`/content/categories/${id}/edit`, '_blank');
+    router.push(`/content/categories/${id}/edit`);
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this category?')) {
+    if (confirm("Are you sure you want to delete this category?")) {
       try {
         const response = await adminApi.deleteCategory(id);
         if (response.success) {
           fetchCategories();
         }
       } catch (error) {
-        console.error('Failed to delete category:', error);
+        console.error("Failed to delete category:", error);
       }
     }
   };
