@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { DataTable } from "@/components/shared/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { adminApi } from "@/lib/api/adminApi";
 import { Quiz } from "@/lib/types";
-import { Plus, Edit, Trash2, Eye } from "lucide-react";
+import { Edit, Eye, Plus, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function QuizzesPage() {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
@@ -20,10 +21,13 @@ export default function QuizzesPage() {
   const fetchQuizzes = async (page = 1, search = "") => {
     setLoading(true);
     try {
-      const response = await adminApi.getAllQuizzes({ page, limit: pagination.limit });
+      const response = await adminApi.getAllQuizzes({
+        page,
+        limit: pagination.limit,
+      });
       if (response.success && response.data) {
         setQuizzes(response.data);
-        setPagination(prev => ({
+        setPagination((prev) => ({
           ...prev,
           page,
           total: response.meta?.total || 0,
@@ -62,10 +66,14 @@ export default function QuizzesPage() {
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case "easy": return "success";
-      case "medium": return "warning";
-      case "hard": return "destructive";
-      default: return "secondary";
+      case "easy":
+        return "success";
+      case "medium":
+        return "warning";
+      case "hard":
+        return "destructive";
+      default:
+        return "secondary";
     }
   };
 
@@ -76,7 +84,11 @@ export default function QuizzesPage() {
       render: (quiz: Quiz) => (
         <div className="w-12 h-8 rounded overflow-hidden bg-muted">
           {quiz.thumbnail_url ? (
-            <img src={quiz.thumbnail_url} alt={quiz.title} className="w-full h-full object-cover" />
+            <img
+              src={quiz.thumbnail_url}
+              alt={quiz.title}
+              className="w-full h-full object-cover"
+            />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-xs">
               {quiz.title.charAt(0)}
@@ -129,13 +141,25 @@ export default function QuizzesPage() {
       label: "Actions",
       render: (quiz: Quiz) => (
         <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm" onClick={() => handleView(quiz.id)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleView(quiz.id)}
+          >
             <Eye className="h-4 w-4" />
           </Button>
-          <Button variant="outline" size="sm" onClick={() => handleEdit(quiz.id)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleEdit(quiz.id)}
+          >
             <Edit className="h-4 w-4" />
           </Button>
-          <Button variant="outline" size="sm" onClick={() => handleDelete(quiz.id)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleDelete(quiz.id)}
+          >
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
@@ -148,12 +172,16 @@ export default function QuizzesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Quizzes</h1>
-          <p className="text-muted-foreground">Manage quiz content and settings</p>
+          <p className="text-muted-foreground">
+            Manage quiz content and settings
+          </p>
         </div>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Create Quiz
-        </Button>
+        <Link href="/content/create">
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Create Quiz
+          </Button>
+        </Link>
       </div>
 
       <DataTable

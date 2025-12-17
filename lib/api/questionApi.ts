@@ -1,5 +1,8 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+export type DifficultyLevel = "easy" | "medium" | "hard";
+export type QuestionType = "multiple_choice" | "checkbox" | "yes_no";
+
 interface ApiResponse<T = unknown> {
   success: boolean;
   message?: string;
@@ -20,14 +23,20 @@ interface PaginatedResponse<T> {
 
 export interface Question {
   id: string;
-  text: string;
-  question_type: "multiple_choice" | "checkbox" | "yes_no";
-  question_image?: string;
+  quiz_id: string;
+  question_type: QuestionType;
+  question_text: string;
+  question_image_url?: string;
+  points: number;
+  display_order: number;
+  metadata?: string;
+  created_at: string;
+  updated_at: string;
   options: QuestionOption[];
-  quizId: string;
-  fun_fact?: FunFact;
-  createdAt: string;
-  updatedAt: string;
+  quiz?: {
+    id: string;
+    title: string;
+  };
 }
 
 export interface QuestionOption {
