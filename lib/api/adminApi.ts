@@ -21,12 +21,13 @@ export interface FunFact {
 
 export interface Certificate {
   id: string;
-  name: string;
-  description?: string;
-  certificate?: string;
-  quizId?: string;
-  createdAt: string;
-  updatedAt: string;
+  user_id: string;
+  quiz_id: string;
+  certificate_url: string;
+  score_achieved: number;
+  issued_at: string;
+  user?: User;
+  quiz?: Quiz;
 }
 
 // Helper function for authenticated requests

@@ -2,8 +2,8 @@
 
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
+import { File, FileText, FolderOpen, HelpCircle, Plus } from "lucide-react";
 import Link from "next/link";
-import { Plus, FolderOpen, HelpCircle, FileText } from "lucide-react";
 
 export default function ContentPage() {
   const contentSections = [
@@ -27,6 +27,13 @@ export default function ContentPage() {
       href: "/content/questions",
       icon: HelpCircle,
       count: "103 questions",
+    },
+    {
+      title: "Certificates",
+      description: "Manage individual quiz certificates",
+      href: "/content/certificates",
+      icon: File,
+      count: "10 certificates",
     },
   ];
 
@@ -60,9 +67,7 @@ export default function ContentPage() {
               </div>
               <div className="mt-4 flex space-x-2">
                 <Button asChild className="flex-1">
-                  <Link href={section.href}>
-                    Manage
-                  </Link>
+                  <Link href={section.href}>Manage</Link>
                 </Button>
                 <Button variant="outline" size="sm">
                   <Plus className="h-4 w-4" />
