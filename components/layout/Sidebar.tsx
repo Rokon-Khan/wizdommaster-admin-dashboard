@@ -28,10 +28,12 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`fixed left-0 top-0 h-full bg-sidebar border-r border-sidebar-border z-40 shadow-sm transition-all duration-300 ${
+      className={`h-screen bg-sidebar border-r border-sidebar-border z-40 shadow-sm transition-all duration-300 ${
         isCollapsed ? "w-16" : "w-64"
       }`}
     >
+      {/* Sidebar Content */}
+
       <div className="flex flex-col h-full py-6">
         {/* Logo */}
         <div className="px-4 mb-8">
