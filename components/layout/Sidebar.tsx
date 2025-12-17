@@ -1,12 +1,13 @@
 "use client";
 
 import {
+  BarChart3,
   Bell,
-  ChevronRight,
-  Grid3x3,
-  Heart,
-  Home,
+  ChevronLeft,
+  FileText,
+  Grid,
   Settings,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -17,69 +18,77 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   const navItems = [
-    { icon: Home, href: "/", label: "Home" },
-    { icon: Grid3x3, href: "/apps", label: "Apps" },
+    { icon: BarChart3, href: "/analytics", label: "Dashboard" },
+    { icon: Users, href: "/users", label: "Users" },
+    { icon: FileText, href: "/content", label: "Content" },
+    { icon: Grid, href: "/apps", label: "Apps" },
     { icon: Settings, href: "/settings", label: "Settings" },
     { icon: Bell, href: "/notifications", label: "Notifications" },
-    { icon: Heart, href: "/favorites", label: "Favorites" },
   ];
 
   return (
-    <aside className="fixed left-0 top-0 h-full bg-white border-r border-gray-200 w-16 md:w-20 z-40 shadow-sm hidden md:flex flex-col">
-      <div className="flex flex-col h-full py-4 md:py-6">
+    <aside
+      className={`fixed left-0 top-0 h-full bg-sidebar border-r border-sidebar-border z-40 shadow-sm transition-all duration-300 ${
+        isCollapsed ? "w-16" : "w-64"
+      }`}
+    >
+      <div className="flex flex-col h-full py-6">
         {/* Logo */}
-        <div className="px-2 md:px-4 mb-6 md:mb-8">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-gray-900 flex items-center justify-center">
-              <div className="w-4 h-4 md:w-5 md:h-5 rounded bg-white"></div>
+        <div className="px-4 mb-8">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <div className="w-5 h-5 rounded bg-primary-foreground"></div>
             </div>
+            {!isCollapsed && (
+              <span className="text-sidebar-foreground font-semibold text-lg">
+                WizdomMaster
+              </span>
+            )}
           </div>
-          <span className="text-gray-900 font-semibold text-xs md:text-sm hidden lg:block">
-            Wellmetrix
-          </span>
         </div>
 
         {/* Navigation Items */}
-        <nav className="flex-1 flex flex-col items-center gap-2 md:gap-4 px-2 md:px-3">
+        <nav className="flex-1 px-3 space-y-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive =
               pathname === item.href ||
-              (item.href !== "/" && pathname?.startsWith(item.href));
+              (item.href !== "/analytics" && pathname?.startsWith(item.href));
 
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`p-2 md:p-3 rounded-lg transition-all duration-200 ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
                   isActive
-                    ? "bg-gray-100 text-gray-900 fill-gray-900"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 }`}
                 title={item.label}
               >
-                <Icon
-                  className={`w-4 h-4 md:w-5 md:h-5 ${
-                    isActive ? "fill-gray-900" : ""
-                  }`}
-                />
+                <Icon className="w-5 h-5 flex-shrink-0" />
+                {!isCollapsed && (
+                  <span className="font-medium">{item.label}</span>
+                )}
               </Link>
             );
           })}
         </nav>
 
         {/* Collapse Button */}
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="mx-auto p-1.5 md:p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-all duration-200 mb-2 md:mb-4"
-          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          <ChevronRight
-            className={`w-4 h-4 md:w-5 md:h-5 transition-transform duration-300 ${
-              isCollapsed ? "rotate-180" : ""
-            }`}
-          />
-        </button>
+        <div className="px-3 mt-4">
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="flex items-center justify-center w-full p-2 text-sidebar-foreground hover:bg-sidebar-accent rounded-lg transition-all duration-200"
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            <ChevronLeft
+              className={`w-5 h-5 transition-transform duration-300 ${
+                isCollapsed ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+        </div>
       </div>
     </aside>
   );

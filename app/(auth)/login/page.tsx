@@ -7,6 +7,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
 import Link from "next/link";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { PasswordInput } from "@/components/ui/password-input";
+import { Label } from "@/components/ui/label";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -45,72 +50,64 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="bg-gray-800 p-8 rounded-lg shadow-xl border border-gray-700">
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-white mb-2">Welcome Back</h1>
-        <p className="text-gray-400">Sign in to your admin dashboard</p>
-      </div>
+    <Card className="card-glow w-full max-w-md">
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl gradient-text">Welcome Back</CardTitle>
+        <CardDescription>Sign in to your admin dashboard</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {error && (
+            <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm">
-            {error}
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              {...register("email")}
+              type="email"
+              placeholder="Enter your email"
+            />
+            {errors.email && (
+              <p className="text-destructive text-sm">{errors.email.message}</p>
+            )}
           </div>
-        )}
 
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Email
-          </label>
-          <input
-            {...register("email")}
-            type="email"
-            className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
-            placeholder="Enter your email"
-          />
-          {errors.email && (
-            <p className="text-red-400 text-sm mt-1">{errors.email.message}</p>
-          )}
-        </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <PasswordInput
+              id="password"
+              {...register("password")}
+              placeholder="Enter your password"
+            />
+            {errors.password && (
+              <p className="text-destructive text-sm">{errors.password.message}</p>
+            )}
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Password
-          </label>
-          <input
-            {...register("password")}
-            type="password"
-            className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
-            placeholder="Enter your password"
-          />
-          {errors.password && (
-            <p className="text-red-400 text-sm mt-1">{errors.password.message}</p>
-          )}
-        </div>
+          <Button type="submit" disabled={isLoading} className="w-full">
+            {isLoading ? "Signing in..." : "Sign In"}
+          </Button>
 
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-medium py-3 px-4 rounded-lg transition-colors"
-        >
-          {isLoading ? "Signing in..." : "Sign In"}
-        </button>
-
-        <div className="text-center space-y-2">
-          <Link
-            href="/forgot-password"
-            className="text-purple-400 hover:text-purple-300 text-sm"
-          >
-            Forgot your password?
-          </Link>
-          <div className="text-gray-400 text-sm">
-            Don't have an account?{" "}
-            <Link href="/register" className="text-purple-400 hover:text-purple-300">
-              Sign up
+          <div className="text-center space-y-2">
+            <Link
+              href="/forgot-password"
+              className="text-primary hover:text-primary/80 text-sm"
+            >
+              Forgot your password?
             </Link>
+            <div className="text-muted-foreground text-sm">
+              Don't have an account?{" "}
+              <Link href="/register" className="text-primary hover:text-primary/80">
+                Sign up
+              </Link>
+            </div>
           </div>
-        </div>
-      </form>
-    </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

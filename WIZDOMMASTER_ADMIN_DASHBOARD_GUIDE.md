@@ -26,7 +26,7 @@ Build a modern, responsive web-based admin dashboard for managing quiz content, 
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                   Admin Dashboard (Browser)              │
-│                    Next.js 14 + React 18                 │
+│                    Next.js 16 + React 19                 │
 └─────────────────────────────────────────────────────────┘
                             │
                             ▼
@@ -40,8 +40,8 @@ Build a modern, responsive web-based admin dashboard for managing quiz content, 
                             │
                             ▼
 ┌─────────────────────────────────────────────────────────┐
-│                    API Client Layer                      │
-│                    Axios + Interceptors                  │
+│                    Built in Next.js Fetch
+│                    Next.js Fetch
 └─────────────────────────────────────────────────────────┘
                             │
                             ▼
@@ -53,15 +53,14 @@ Build a modern, responsive web-based admin dashboard for managing quiz content, 
 
 ### **Technology Stack**
 
-- **Framework**: Next.js 14+ (App Router)
-- **UI Library**: React 18+
+- **Framework**: Next.js 16.0.7+ (App Router)
+- **UI Library**: React 19+
 - **Language**: TypeScript 5.3+
-- **UI Components**: Material-UI (MUI) 5.14+ or Ant Design 5.12+
-- **State Management**: Zustand 4.4+ or Redux Toolkit
-- **Forms**: React Hook Form 7.49+ + Zod 3.22+
-- **Tables**: TanStack Table 8.11+
+- **Shadcn UI compones**: Latest Shadcn UI Components
+- **State Management**: Redux Toolkit
+- **Forms**: React Hook Form 7.68.0 + Zod 4.1.13
+- **Tables**: ShadCN Table
 - **Charts**: Recharts 2.10+
-- **HTTP Client**: Axios 1.6+
 - **Authentication**: NextAuth.js 4.24+
 
 ---

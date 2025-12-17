@@ -1,52 +1,6 @@
+import { ApiResponse, PaginatedResponse, User, Category, Quiz, Question, Analytics } from '../types';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-interface ApiResponse<T = unknown> {
-  success: boolean;
-  message?: string;
-  data?: T;
-}
-
-interface PaginatedResponse<T> {
-  success: boolean;
-  message?: string;
-  data?: T[];
-  meta?: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-}
-
-// Types
-export interface Category {
-  id: string;
-  name: string;
-  description?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Quiz {
-  id: string;
-  title: string;
-  description?: string;
-  categoryId: string;
-  thumbnail?: string;
-  difficulty?: string;
-  timeLimit?: number;
-  questions?: Question[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Question {
-  id: string;
-  text: string;
-  options: string[];
-  correctAnswer: number;
-  explanation?: string;
-}
 
 export interface FunFact {
   id: string;
@@ -66,27 +20,6 @@ export interface Certificate {
   quizId?: string;
   createdAt: string;
   updatedAt: string;
-}
-
-export interface User {
-  id: string;
-  email: string;
-  full_name: string;
-  role: "user" | "admin";
-  avatar_url?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Analytics {
-  totalUsers: number;
-  totalQuizzes: number;
-  totalCategories: number;
-  totalFunFacts: number;
-  totalCertificates: number;
-  recentUsers?: User[];
-  quizCompletions?: number;
-  activeUsers?: number;
 }
 
 // Helper function for authenticated requests

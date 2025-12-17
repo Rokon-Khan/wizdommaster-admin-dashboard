@@ -6,6 +6,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
 import Link from "next/link";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Mail } from "lucide-react";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -47,73 +52,61 @@ export default function ForgotPasswordPage() {
 
   if (success) {
     return (
-      <div className="bg-gray-800 p-8 rounded-lg shadow-xl border border-gray-700 text-center">
-        <div className="text-green-400 mb-4">
-          <svg className="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-          </svg>
-        </div>
-        <h2 className="text-xl font-bold text-white mb-2">Email Sent!</h2>
-        <p className="text-gray-400 mb-4">
-          We've sent a password reset link to your email address.
-        </p>
-        <Link
-          href="/login"
-          className="text-purple-400 hover:text-purple-300 text-sm"
-        >
-          Back to login
-        </Link>
-      </div>
+      <Card className="card-glow w-full max-w-md text-center">
+        <CardContent className="pt-6">
+          <div className="text-primary mb-4">
+            <Mail className="w-16 h-16 mx-auto" />
+          </div>
+          <CardTitle className="text-xl mb-2">Email Sent!</CardTitle>
+          <CardDescription className="mb-4">
+            We've sent a password reset link to your email address.
+          </CardDescription>
+          <Button asChild variant="outline">
+            <Link href="/login">Back to login</Link>
+          </Button>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="bg-gray-800 p-8 rounded-lg shadow-xl border border-gray-700">
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-white mb-2">Forgot Password</h1>
-        <p className="text-gray-400">Enter your email to reset your password</p>
-      </div>
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm">
-            {error}
-          </div>
-        )}
-
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Email
-          </label>
-          <input
-            {...register("email")}
-            type="email"
-            className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
-            placeholder="Enter your email"
-          />
-          {errors.email && (
-            <p className="text-red-400 text-sm mt-1">{errors.email.message}</p>
+    <Card className="card-glow w-full max-w-md">
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl gradient-text">Forgot Password</CardTitle>
+        <CardDescription>Enter your email to reset your password</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {error && (
+            <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
           )}
-        </div>
 
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-medium py-3 px-4 rounded-lg transition-colors"
-        >
-          {isLoading ? "Sending..." : "Send Reset Link"}
-        </button>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              {...register("email")}
+              type="email"
+              placeholder="Enter your email"
+            />
+            {errors.email && (
+              <p className="text-destructive text-sm">{errors.email.message}</p>
+            )}
+          </div>
 
-        <div className="text-center">
-          <Link
-            href="/login"
-            className="text-purple-400 hover:text-purple-300 text-sm"
-          >
-            Back to login
-          </Link>
-        </div>
-      </form>
-    </div>
+          <Button type="submit" disabled={isLoading} className="w-full">
+            {isLoading ? "Sending..." : "Send Reset Link"}
+          </Button>
+
+          <div className="text-center">
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/login">Back to login</Link>
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
