@@ -1,17 +1,23 @@
 "use client";
 
-import { useAuth } from "@/lib/auth-context";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useState } from "react";
-import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { PasswordInput } from "@/components/ui/password-input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/Card";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
+import { useAuth } from "@/lib/auth-context";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -37,23 +43,25 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
     setError("");
-    
+
     const result = await login(data.email, data.password);
-    
+
     if (result.success) {
       router.push("/");
     } else {
       setError(result.error || "Login failed");
     }
-    
+
     setIsLoading(false);
   };
 
   return (
-    <Card className="card-glow w-full max-w-md">
+    <Card className="w-full max-w-md">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl gradient-text">Welcome Back</CardTitle>
-        <CardDescription>Sign in to your admin dashboard</CardDescription>
+        <CardDescription>
+          Sign in to your Wizdommaster admin dashboard
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -84,7 +92,9 @@ export default function LoginPage() {
               placeholder="Enter your password"
             />
             {errors.password && (
-              <p className="text-destructive text-sm">{errors.password.message}</p>
+              <p className="text-destructive text-sm">
+                {errors.password.message}
+              </p>
             )}
           </div>
 
@@ -101,7 +111,10 @@ export default function LoginPage() {
             </Link>
             <div className="text-muted-foreground text-sm">
               Don't have an account?{" "}
-              <Link href="/register" className="text-primary hover:text-primary/80">
+              <Link
+                href="/register"
+                className="text-primary hover:text-primary/80"
+              >
                 Sign up
               </Link>
             </div>

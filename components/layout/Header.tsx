@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/lib/auth-context";
-import { Bell, LogOut, Plus, Search } from "lucide-react";
+import { Bell, LogOut, Search } from "lucide-react";
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -20,10 +20,10 @@ export default function Header() {
         <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Left: User Profile */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-medium">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-linear-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-medium">
               {user?.full_name?.charAt(0) || "A"}
             </div>
-            <div className="flex flex-col hidden sm:flex">
+            <div className="flex-col hidden sm:flex">
               <span className="text-xs sm:text-sm font-medium text-gray-900">
                 {user?.full_name || "Admin"}
               </span>
@@ -62,10 +62,10 @@ export default function Header() {
             </button>
 
             {/* Add Data Source Button */}
-            <button className="flex items-center gap-1 sm:gap-2 bg-[#1E40AF] hover:bg-[#1e3a8a] text-white px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all duration-200 text-xs sm:text-sm font-medium">
+            {/* <button className="flex items-center gap-1 sm:gap-2 bg-[#1E40AF] hover:bg-[#1e3a8a] text-white px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all duration-200 text-xs sm:text-sm font-medium">
               <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">Add Data Source</span>
-            </button>
+            </button> */}
 
             {/* Logout */}
             <button
