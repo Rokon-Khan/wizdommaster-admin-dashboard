@@ -15,6 +15,7 @@ import {
   Bell,
   LayoutDashboard,
   LogOut,
+  PanelLeftIcon,
   Search,
   User,
   Users,
@@ -22,7 +23,12 @@ import {
 import Link from "next/link";
 import { ThemeToggle } from "../shared/theme-toggle";
 
-export default function Header() {
+type HeaderProps = {
+  isCollapsed: boolean;
+  onToggleSidebar: () => void;
+};
+
+export default function Header({ isCollapsed, onToggleSidebar }: HeaderProps) {
   const { user, logout } = useAuth();
 
   // Get current date
@@ -51,7 +57,12 @@ export default function Header() {
               </div>
             </div>
           </div> */}
-
+          <PanelLeftIcon
+            onClick={onToggleSidebar}
+            className={`w-5 h-5 transition-transform duration-300 ${
+              isCollapsed ? "rotate-180" : ""
+            }`}
+          />
           {/* Center: Date */}
           <div className="text-xs sm:text-sm text-gray-700">
             <span className="hidden sm:inline">

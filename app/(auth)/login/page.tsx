@@ -13,7 +13,6 @@ import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useAuth } from "@/lib/auth-context";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -102,14 +101,14 @@ export default function LoginPage() {
             {isLoading ? "Signing in..." : "Sign In"}
           </Button>
 
-          <div className="text-center space-y-2">
+          {/* <div className="text-center space-y-2">
             <Link
               href="/forgot-password"
               className="text-primary hover:text-primary/80 text-sm"
             >
               Forgot your password?
             </Link>
-            {/* <div className="text-muted-foreground text-sm">
+            <div className="text-muted-foreground text-sm">
               Don't have an account?{" "}
               <Link
                 href="/register"
@@ -117,8 +116,8 @@ export default function LoginPage() {
               >
                 Sign up
               </Link>
-            </div> */}
-          </div>
+            </div>
+          </div> */}
         </form>
       </CardContent>
     </Card>
