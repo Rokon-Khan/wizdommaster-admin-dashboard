@@ -44,8 +44,18 @@ const authFetch = async (url: string, options: RequestInit = {}) => {
 
 export const adminApi = {
   // ==================== Category Routes ====================
-  async getAllCategories(): Promise<PaginatedResponse<Category>> {
-    return authFetch(`${API_BASE_URL}/admin/categories`);
+  async getAllCategories(params?: {
+    page?: number;
+    limit?: number;
+    searchTerm?: string;
+  }): Promise<PaginatedResponse<Category>> {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.append("page", params.page.toString());
+    if (params?.limit) searchParams.append("limit", params.limit.toString());
+    if (params?.searchTerm) searchParams.append("searchTerm", params.searchTerm);
+
+    const query = searchParams.toString();
+    return authFetch(`${API_BASE_URL}/admin/categories${query ? `?${query}` : ""}`);
   },
 
   async getCategoryById(id: string): Promise<ApiResponse<Category>> {
@@ -85,17 +95,16 @@ export const adminApi = {
     page?: number;
     limit?: number;
     categoryId?: string;
+    searchTerm?: string;
   }): Promise<PaginatedResponse<Quiz>> {
     const searchParams = new URLSearchParams();
     if (params?.page) searchParams.append("page", params.page.toString());
     if (params?.limit) searchParams.append("limit", params.limit.toString());
-    if (params?.categoryId)
-      searchParams.append("categoryId", params.categoryId);
+    if (params?.categoryId) searchParams.append("categoryId", params.categoryId);
+    if (params?.searchTerm) searchParams.append("searchTerm", params.searchTerm);
 
     const query = searchParams.toString();
-    return authFetch(
-      `${API_BASE_URL}/admin/quizzes${query ? `?${query}` : ""}`
-    );
+    return authFetch(`${API_BASE_URL}/admin/quizzes${query ? `?${query}` : ""}`);
   },
 
   async getQuizById(id: string): Promise<ApiResponse<Quiz>> {
@@ -169,15 +178,15 @@ export const adminApi = {
   async getAllCertificates(params?: {
     page?: number;
     limit?: number;
+    searchTerm?: string;
   }): Promise<PaginatedResponse<Certificate>> {
     const searchParams = new URLSearchParams();
     if (params?.page) searchParams.append("page", params.page.toString());
     if (params?.limit) searchParams.append("limit", params.limit.toString());
+    if (params?.searchTerm) searchParams.append("searchTerm", params.searchTerm);
 
     const query = searchParams.toString();
-    return authFetch(
-      `${API_BASE_URL}/admin/certificates${query ? `?${query}` : ""}`
-    );
+    return authFetch(`${API_BASE_URL}/admin/certificates${query ? `?${query}` : ""}`);
   },
 
   async getCertificateById(id: string): Promise<ApiResponse<Certificate>> {
@@ -229,11 +238,13 @@ export const adminApi = {
     page?: number;
     limit?: number;
     role?: string;
+    searchTerm?: string;
   }): Promise<PaginatedResponse<User>> {
     const searchParams = new URLSearchParams();
     if (params?.page) searchParams.append("page", params.page.toString());
     if (params?.limit) searchParams.append("limit", params.limit.toString());
     if (params?.role) searchParams.append("role", params.role);
+    if (params?.searchTerm) searchParams.append("searchTerm", params.searchTerm);
 
     const query = searchParams.toString();
     return authFetch(`${API_BASE_URL}/admin/users${query ? `?${query}` : ""}`);

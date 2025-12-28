@@ -235,12 +235,13 @@ export default function UsersPage() {
       const response = await adminApi.getAllUsers({
         page,
         limit: pagination.limit,
+        searchTerm: search || undefined,
       });
       if (response.success && response.data) {
         setUsers(response.data);
         setPagination((prev) => ({
           ...prev,
-          page,
+          page: response.meta?.page || 1,
           total: response.meta?.total || 0,
         }));
       }

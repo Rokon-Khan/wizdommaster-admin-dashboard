@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -13,7 +14,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { adminApi, Certificate } from "@/lib/api/adminApi";
-import { Eye, FileText, Plus, Trash2 } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  FileText,
+  Plus,
+  Search,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -21,12 +30,34 @@ import { toast } from "sonner";
 export default function CertificatesPage() {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+  });
 
-  const fetchCertificates = async () => {
+  const fetchCertificates = async (page = 1, search = "") => {
+    setLoading(true);
     try {
-      const response = await adminApi.getAllCertificates();
+      const response = await adminApi.getAllCertificates({
+        page,
+        limit: pagination.limit,
+        searchTerm: search || undefined,
+      });
       if (response.success && response.data) {
         setCertificates(response.data);
+        setPagination({
+          page: response.meta?.page || 1,
+          limit: response.meta?.limit || 10,
+          total: response.meta?.total || 0,
+          totalPages:
+            response.meta?.totalPages ||
+            Math.ceil(
+              (response.meta?.total || 0) / (response.meta?.limit || 10)
+            ),
+        });
       }
     } catch (error) {
       toast.error("Failed to fetch certificates");
@@ -39,6 +70,15 @@ export default function CertificatesPage() {
     fetchCertificates();
   }, []);
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchCertificates(1, searchTerm);
+  };
+
+  const handlePageChange = (page: number) => {
+    fetchCertificates(page, searchTerm);
+  };
+
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this certificate?")) return;
 
@@ -46,7 +86,7 @@ export default function CertificatesPage() {
       const response = await adminApi.deleteCertificate(id);
       if (response.success) {
         toast.success("Certificate deleted successfully");
-        fetchCertificates();
+        fetchCertificates(pagination.page, searchTerm);
       } else {
         toast.error("Failed to delete certificate");
       }
@@ -80,8 +120,11 @@ export default function CertificatesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Certificates</h1>
+      <div className="flex justify-between items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold">Certificates</h1>
+          <p className="text-muted-foreground">Manage user certificates</p>
+        </div>
         <Link href="/content/certificates/create">
           <Button>
             <Plus className="h-4 w-4 mr-2" />
@@ -92,7 +135,20 @@ export default function CertificatesPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>All Certificates</CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle>All Certificates</CardTitle>
+            <form onSubmit={handleSearch} className="flex gap-2">
+              <Input
+                placeholder="Search certificates..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-64"
+              />
+              <Button type="submit" variant="outline" size="icon">
+                <Search className="h-4 w-4" />
+              </Button>
+            </form>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
@@ -110,10 +166,12 @@ export default function CertificatesPage() {
               {certificates.map((certificate) => (
                 <TableRow key={certificate.id}>
                   <TableCell>
-                    {certificate.user?.name || certificate.user_id}
+                    {certificate.user?.full_name ||
+                      `User ${certificate.user_id.slice(0, 8)}`}
                   </TableCell>
                   <TableCell>
-                    {certificate.quiz?.title || certificate.quiz_id}
+                    {certificate.quiz?.title ||
+                      `Quiz ${certificate.quiz_id.slice(0, 8)}`}
                   </TableCell>
                   <TableCell>
                     <Badge variant="secondary">
@@ -159,6 +217,85 @@ export default function CertificatesPage() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Pagination */}
+      {/* {pagination.total > pagination.limit && (
+        <div className="flex justify-between items-center">
+          <p className="text-sm text-muted-foreground">
+            Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results
+          </p>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => handlePageChange(pagination.page - 1)}
+              disabled={pagination.page === 1 || loading}
+            >
+              Previous
+            </Button>
+            <span className="flex items-center px-4">
+              Page {pagination.page} of {pagination.totalPages}
+            </span>
+            <Button
+              variant="outline"
+              onClick={() => handlePageChange(pagination.page + 1)}
+              disabled={pagination.page === pagination.totalPages || loading}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )} */}
+
+      {/* Pagination */}
+      {pagination && (
+        <div className="flex items-center justify-between space-x-2 py-4">
+          <div className="text-sm text-muted-foreground">
+            Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
+            {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}
+            {pagination.total} entries
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(pagination.page - 1)}
+              disabled={pagination.page <= 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Previous
+            </Button>
+            <div className="flex items-center space-x-1">
+              {Array.from(
+                { length: Math.min(5, pagination.totalPages) },
+                (_, i) => {
+                  const pageNum = i + 1;
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={
+                        pagination.page === pageNum ? "default" : "outline"
+                      }
+                      size="sm"
+                      onClick={() => handlePageChange(pageNum)}
+                    >
+                      {pageNum}
+                    </Button>
+                  );
+                }
+              )}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(pagination.page + 1)}
+              disabled={pagination.page >= pagination.totalPages}
+            >
+              Next
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
