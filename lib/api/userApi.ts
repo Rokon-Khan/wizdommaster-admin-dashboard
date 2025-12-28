@@ -102,7 +102,9 @@ export const userApi = {
     if (params?.limit) searchParams.append("limit", params.limit.toString());
 
     const query = searchParams.toString();
-    return authFetch(`${API_BASE_URL}/users/me/progress${query ? `?${query}` : ""}`);
+    return authFetch(
+      `${API_BASE_URL}/users/me/progress${query ? `?${query}` : ""}`
+    );
   },
 
   // ==================== User Attempts Routes ====================
@@ -117,7 +119,9 @@ export const userApi = {
     if (params?.quizId) searchParams.append("quizId", params.quizId);
 
     const query = searchParams.toString();
-    return authFetch(`${API_BASE_URL}/users/me/attempts${query ? `?${query}` : ""}`);
+    return authFetch(
+      `${API_BASE_URL}/users/me/attempts${query ? `?${query}` : ""}`
+    );
   },
 
   // ==================== User Certificates Routes ====================
@@ -130,6 +134,22 @@ export const userApi = {
     if (params?.limit) searchParams.append("limit", params.limit.toString());
 
     const query = searchParams.toString();
-    return authFetch(`${API_BASE_URL}/users/me/certificates${query ? `?${query}` : ""}`);
+    return authFetch(
+      `${API_BASE_URL}/users/me/certificates${query ? `?${query}` : ""}`
+    );
+  },
+
+  //dectivate user account
+  async deactivateUserAccount(id: string): Promise<ApiResponse> {
+    return authFetch(`${API_BASE_URL}/users/${id}`, {
+      method: "PATCH",
+    });
+  },
+
+  // delete user account
+  async deleteUser(id: string): Promise<ApiResponse> {
+    return authFetch(`${API_BASE_URL}/users/${id}`, {
+      method: "DELETE",
+    });
   },
 };
