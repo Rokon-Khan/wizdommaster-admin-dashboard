@@ -209,7 +209,7 @@ import { Switch } from "@/components/ui/switch";
 import { adminApi } from "@/lib/api/adminApi";
 import { userApi } from "@/lib/api/userApi";
 import { User } from "@/lib/types";
-import { Edit, Eye, Trash2 } from "lucide-react";
+import { Eye, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -268,10 +268,10 @@ export default function UsersPage() {
     setModalOpen(true);
   };
 
-  const handleEdit = (id: string) => {
-    // TODO: Implement edit user
-    console.log("Edit user:", id);
-  };
+  // const handleEdit = (id: string) => {
+  //   // TODO: Implement edit user
+  //   console.log("Edit user:", id);
+  // };
 
   const handleDeleteClick = (id: string) => {
     setUserToDelete(id);
@@ -418,18 +418,19 @@ export default function UsersPage() {
           >
             <Eye className="h-4 w-4" />
           </Button>
-          <Button
+          {/* <Button
             variant="outline"
             size="sm"
             onClick={() => handleEdit(user.id)}
           >
             <Edit className="h-4 w-4" />
-          </Button>
+          </Button> */}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button
                 variant="outline"
                 size="sm"
+                disabled={user.role === "admin"}
                 onClick={() => handleDeleteClick(user.id)}
               >
                 <Trash2 className="h-4 w-4" />
@@ -490,7 +491,7 @@ export default function UsersPage() {
       />
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog
+      {/* <AlertDialog
         open={!!userToDelete}
         onOpenChange={(open) => !open && setUserToDelete(null)}
       >
@@ -514,10 +515,10 @@ export default function UsersPage() {
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog> */}
 
       {/* Toggle Status Confirmation Dialog */}
-      <AlertDialog
+      {/* <AlertDialog
         open={!!userToToggle}
         onOpenChange={(open) => !open && setUserToToggle(null)}
       >
@@ -543,7 +544,7 @@ export default function UsersPage() {
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog> */}
     </div>
   );
 }

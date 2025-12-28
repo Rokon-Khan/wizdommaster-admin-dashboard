@@ -109,7 +109,7 @@ export default function LoginPage() {
             >
               Forgot your password?
             </Link>
-            <div className="text-muted-foreground text-sm">
+            {/* <div className="text-muted-foreground text-sm">
               Don't have an account?{" "}
               <Link
                 href="/register"
@@ -117,7 +117,7 @@ export default function LoginPage() {
               >
                 Sign up
               </Link>
-            </div>
+            </div> */}
           </div>
         </form>
       </CardContent>

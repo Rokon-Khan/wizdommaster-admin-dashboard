@@ -209,7 +209,7 @@ export const adminApi = {
 
   // ==================== Analytics Routes ====================
   async getAnalytics(): Promise<ApiResponse<Analytics>> {
-    return authFetch(`${API_BASE_URL}/admin/analytics`);
+    return authFetch(`${API_BASE_URL}/admin/analytics`, { method: "GET" });
   },
 
   // ==================== User Management Routes ====================

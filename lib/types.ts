@@ -94,6 +94,8 @@ export interface Analytics {
     totalQuizzes: number;
     totalQuestions: number;
     completedAttempts: number;
+    totalCategories: number;
+    totalCertificates: number;
   };
   recentActivity: {
     recentUsers: User[];
