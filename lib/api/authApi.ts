@@ -71,6 +71,24 @@ export const authApi = {
     return response.json();
   },
 
+  // Example frontend API call
+
+  async changePassword(data: {
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+  }): Promise<ApiResponse> {
+    const response = await fetch(`${API_BASE_URL}/auth/change-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(data),
+    });
+    return response.json();
+  },
+
   async getMe(): Promise<ApiResponse> {
     const response = await fetch(`${API_BASE_URL}/auth/me`, {
       method: "GET",
