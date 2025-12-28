@@ -212,6 +212,18 @@ export const adminApi = {
     return authFetch(`${API_BASE_URL}/admin/analytics`, { method: "GET" });
   },
 
+  async getMonthlyGrowth(): Promise<ApiResponse<any[]>> {
+    return authFetch(`${API_BASE_URL}/admin/analytics/monthly-growth`);
+  },
+
+  async getDailyActivity(): Promise<ApiResponse<any[]>> {
+    return authFetch(`${API_BASE_URL}/admin/analytics/daily-activity`);
+  },
+
+  async getEngagementTrend(): Promise<ApiResponse<any[]>> {
+    return authFetch(`${API_BASE_URL}/admin/analytics/engagement-trend`);
+  },
+
   // ==================== User Management Routes ====================
   async getAllUsers(params?: {
     page?: number;

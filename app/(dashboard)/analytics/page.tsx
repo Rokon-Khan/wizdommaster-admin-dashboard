@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { adminApi } from "@/lib/api/adminApi";
 import { Analytics } from "@/lib/types";
 import { useEffect, useState } from "react";
@@ -19,35 +20,34 @@ import {
   YAxis,
 } from "recharts";
 
-const monthlyData = [
-  { name: "Jan", users: 1200, revenue: 45000, engagement: 65 },
-  { name: "Feb", users: 1900, revenue: 52000, engagement: 72 },
-  { name: "Mar", users: 3000, revenue: 61000, engagement: 78 },
-  { name: "Apr", users: 2780, revenue: 58000, engagement: 75 },
-  { name: "May", users: 3890, revenue: 72000, engagement: 82 },
-  { name: "Jun", users: 4390, revenue: 85000, engagement: 88 },
-];
-
-const dailyData = [
-  { name: "Mon", active: 1200, new: 150 },
-  { name: "Tue", active: 1900, new: 200 },
-  { name: "Wed", active: 3000, new: 250 },
-  { name: "Thu", active: 2780, new: 180 },
-  { name: "Fri", active: 3890, new: 300 },
-  { name: "Sat", active: 2500, new: 120 },
-  { name: "Sun", active: 2100, new: 100 },
-];
-
 export default function AnalyticsPage() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  const [monthlyData, setMonthlyData] = useState<any[]>([]);
+  const [dailyData, setDailyData] = useState<any[]>([]);
+  const [engagementData, setEngagementData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAnalytics = async () => {
+    const fetchAllData = async () => {
       try {
-        const response = await adminApi.getAnalytics();
-        if (response.success && response.data) {
-          setAnalytics(response.data);
+        const [analyticsRes, monthlyRes, dailyRes, engagementRes] = await Promise.all([
+          adminApi.getAnalytics(),
+          adminApi.getMonthlyGrowth(),
+          adminApi.getDailyActivity(),
+          adminApi.getEngagementTrend(),
+        ]);
+
+        if (analyticsRes.success && analyticsRes.data) {
+          setAnalytics(analyticsRes.data);
+        }
+        if (monthlyRes.success && monthlyRes.data) {
+          setMonthlyData(monthlyRes.data);
+        }
+        if (dailyRes.success && dailyRes.data) {
+          setDailyData(dailyRes.data);
+        }
+        if (engagementRes.success && engagementRes.data) {
+          setEngagementData(engagementRes.data);
         }
       } catch (error) {
         console.error("Failed to fetch analytics:", error);
@@ -56,7 +56,7 @@ export default function AnalyticsPage() {
       }
     };
 
-    fetchAnalytics();
+    fetchAllData();
   }, []);
 
   return (
@@ -120,38 +120,46 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={monthlyData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                  <XAxis dataKey="name" stroke="#6B7280" />
-                  <YAxis stroke="#6B7280" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#FFFFFF",
-                      border: "1px solid #E5E7EB",
-                      borderRadius: "8px",
-                      color: "#111827",
-                    }}
-                  />
-                  <Legend />
-                  <Area
-                    type="monotone"
-                    dataKey="users"
-                    stackId="1"
-                    stroke="#60A5FA"
-                    fill="#60A5FA"
-                    fillOpacity={0.6}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="revenue"
-                    stackId="2"
-                    stroke="#A78BFA"
-                    fill="#A78BFA"
-                    fillOpacity={0.6}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+              {loading ? (
+                <div className="space-y-3">
+                  {[...Array(6)].map((_, i) => (
+                    <Skeleton key={i} className="h-8 w-full" />
+                  ))}
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={monthlyData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                    <XAxis dataKey="name" stroke="#6B7280" />
+                    <YAxis stroke="#6B7280" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#FFFFFF",
+                        border: "1px solid #E5E7EB",
+                        borderRadius: "8px",
+                        color: "#111827",
+                      }}
+                    />
+                    <Legend />
+                    <Area
+                      type="monotone"
+                      dataKey="users"
+                      stackId="1"
+                      stroke="#60A5FA"
+                      fill="#60A5FA"
+                      fillOpacity={0.6}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="revenue"
+                      stackId="2"
+                      stroke="#A78BFA"
+                      fill="#A78BFA"
+                      fillOpacity={0.6}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -162,8 +170,53 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="h-80">
+              {loading ? (
+                <div className="space-y-3">
+                  {[...Array(6)].map((_, i) => (
+                    <Skeleton key={i} className="h-8 w-full" />
+                  ))}
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={dailyData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                    <XAxis dataKey="name" stroke="#6B7280" />
+                    <YAxis stroke="#6B7280" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#FFFFFF",
+                        border: "1px solid #E5E7EB",
+                        borderRadius: "8px",
+                        color: "#111827",
+                      }}
+                    />
+                    <Legend />
+                    <Bar dataKey="active" fill="#60A5FA" radius={[8, 8, 0, 0]} />
+                    <Bar dataKey="new" fill="#FB923C" radius={[8, 8, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Engagement Trend */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Engagement Trend</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-80">
+            {loading ? (
+              <div className="space-y-3">
+                {[...Array(6)].map((_, i) => (
+                  <Skeleton key={i} className="h-8 w-full" />
+                ))}
+              </div>
+            ) : (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={dailyData}>
+                <LineChart data={engagementData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                   <XAxis dataKey="name" stroke="#6B7280" />
                   <YAxis stroke="#6B7280" />
@@ -176,46 +229,17 @@ export default function AnalyticsPage() {
                     }}
                   />
                   <Legend />
-                  <Bar dataKey="active" fill="#60A5FA" radius={[8, 8, 0, 0]} />
-                  <Bar dataKey="new" fill="#FB923C" radius={[8, 8, 0, 0]} />
-                </BarChart>
+                  <Line
+                    type="monotone"
+                    dataKey="engagement"
+                    stroke="#A78BFA"
+                    strokeWidth={3}
+                    dot={{ fill: "#A78BFA", r: 5 }}
+                    activeDot={{ r: 7 }}
+                  />
+                </LineChart>
               </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Engagement Trend */}
-      <Card className="bg-white">
-        <CardHeader>
-          <CardTitle className="text-gray-900">Engagement Trend</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={monthlyData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                <XAxis dataKey="name" stroke="#6B7280" />
-                <YAxis stroke="#6B7280" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#FFFFFF",
-                    border: "1px solid #E5E7EB",
-                    borderRadius: "8px",
-                    color: "#111827",
-                  }}
-                />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="engagement"
-                  stroke="#A78BFA"
-                  strokeWidth={3}
-                  dot={{ fill: "#A78BFA", r: 5 }}
-                  activeDot={{ r: 7 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            )}
           </div>
         </CardContent>
       </Card>
