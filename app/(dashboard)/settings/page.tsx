@@ -1,37 +1,52 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/Card";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PasswordInput } from "@/components/ui/password-input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { authApi } from "@/lib/api/authApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Bell, Globe, Lock, Palette, Save } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-const passwordSchema = z.object({
-  currentPassword: z.string().min(1, "Current password is required"),
-  newPassword: z.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: z.string().min(1, "Please confirm your password"),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+const passwordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Current password is required"),
+    newPassword: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 type PasswordFormData = z.infer<typeof passwordSchema>;
 
 export default function SettingsPage() {
+  const { theme, setTheme } = useTheme();
   const [notifications, setNotifications] = useState({
     email: true,
     push: false,
     sms: false,
   });
-  const [theme, setTheme] = useState("dark");
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   const {
@@ -66,7 +81,9 @@ export default function SettingsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Settings</h1>
-        <p className="text-muted-foreground">Manage your account and platform preferences</p>
+        <p className="text-muted-foreground">
+          Manage your account and platform preferences
+        </p>
       </div>
 
       {/* Security */}
@@ -89,38 +106,41 @@ export default function SettingsPage() {
               Change Password
             </Button>
           ) : (
-            <form onSubmit={handleSubmit(handlePasswordChange)} className="space-y-4">
+            <form
+              onSubmit={handleSubmit(handlePasswordChange)}
+              className="space-y-4"
+            >
               <div className="space-y-2">
                 <Label htmlFor="currentPassword">Current Password</Label>
-                <Input
+                <PasswordInput
                   id="currentPassword"
-                  type="password"
                   {...register("currentPassword")}
                 />
                 {errors.currentPassword && (
-                  <p className="text-destructive text-sm">{errors.currentPassword.message}</p>
+                  <p className="text-destructive text-sm">
+                    {errors.currentPassword.message}
+                  </p>
                 )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="newPassword">New Password</Label>
-                <Input
-                  id="newPassword"
-                  type="password"
-                  {...register("newPassword")}
-                />
+                <PasswordInput id="newPassword" {...register("newPassword")} />
                 {errors.newPassword && (
-                  <p className="text-destructive text-sm">{errors.newPassword.message}</p>
+                  <p className="text-destructive text-sm">
+                    {errors.newPassword.message}
+                  </p>
                 )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input
+                <PasswordInput
                   id="confirmPassword"
-                  type="password"
                   {...register("confirmPassword")}
                 />
                 {errors.confirmPassword && (
-                  <p className="text-destructive text-sm">{errors.confirmPassword.message}</p>
+                  <p className="text-destructive text-sm">
+                    {errors.confirmPassword.message}
+                  </p>
                 )}
               </div>
               <div className="flex gap-2">
@@ -150,13 +170,17 @@ export default function SettingsPage() {
             <Bell className="w-5 h-5" />
             <CardTitle>Notifications</CardTitle>
           </div>
-          <CardDescription>Configure how you receive notifications</CardDescription>
+          <CardDescription>
+            Configure how you receive notifications
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">Email Notifications</p>
-              <p className="text-sm text-muted-foreground">Receive updates via email</p>
+              <p className="text-sm text-muted-foreground">
+                Receive updates via email
+              </p>
             </div>
             <Switch
               checked={notifications.email}
@@ -168,7 +192,9 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">Push Notifications</p>
-              <p className="text-sm text-muted-foreground">Receive browser push notifications</p>
+              <p className="text-sm text-muted-foreground">
+                Receive browser push notifications
+              </p>
             </div>
             <Switch
               checked={notifications.push}
@@ -180,7 +206,9 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">SMS Notifications</p>
-              <p className="text-sm text-muted-foreground">Receive updates via SMS</p>
+              <p className="text-sm text-muted-foreground">
+                Receive updates via SMS
+              </p>
             </div>
             <Switch
               checked={notifications.sms}
@@ -211,7 +239,7 @@ export default function SettingsPage() {
               <SelectContent>
                 <SelectItem value="dark">Dark</SelectItem>
                 <SelectItem value="light">Light</SelectItem>
-                <SelectItem value="auto">Auto</SelectItem>
+                <SelectItem value="system">System</SelectItem>
               </SelectContent>
             </Select>
           </div>

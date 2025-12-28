@@ -114,9 +114,9 @@ export default function AnalyticsPage() {
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-        <Card className="bg-white">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-gray-900">Monthly Growth</CardTitle>
+            <CardTitle>Monthly Growth</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-80">
@@ -156,9 +156,9 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-gray-900">Daily Activity</CardTitle>
+            <CardTitle>Daily Activity</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-80">
