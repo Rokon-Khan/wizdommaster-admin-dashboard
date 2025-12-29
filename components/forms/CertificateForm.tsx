@@ -11,6 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SearchableCombobox, ComboboxOption } from "@/components/ui/searchable-combobox";
+import { Combobox } from "@/components/ui/combobox";
 import { adminApi, Certificate } from "@/lib/api/adminApi";
 import { Quiz, User } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,6 +20,7 @@ import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
+import { toast } from "sonner";
 
 const certificateSchema = z.object({
   user_id: z.string().min(1, "User is required"),
@@ -40,6 +43,10 @@ export function CertificateForm({
 }: CertificateFormProps) {
   const [users, setUsers] = useState<User[]>([]);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [userOptions, setUserOptions] = useState<ComboboxOption[]>([]);
+  const [quizOptions, setQuizOptions] = useState<ComboboxOption[]>([]);
+  const [userSearchLoading, setUserSearchLoading] = useState(false);
+  const [quizSearchLoading, setQuizSearchLoading] = useState(false);
   const [certificateFile, setCertificateFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(
     certificate?.certificate_url || null
@@ -63,22 +70,107 @@ export function CertificateForm({
     const fetchData = async () => {
       try {
         const [usersResponse, quizzesResponse] = await Promise.all([
-          adminApi.getAllUsers(),
-          adminApi.getAllQuizzes(),
+          adminApi.getAllUsers({ limit: 10 }),
+          adminApi.getAllQuizzes({ limit: 10 }),
         ]);
         
         if (usersResponse.success && usersResponse.data) {
           setUsers(usersResponse.data);
+          setUserOptions(
+            usersResponse.data.map((user) => ({
+              value: user.id,
+              label: `${user.full_name} (${user.email})`,
+            }))
+          );
         }
         if (quizzesResponse.success && quizzesResponse.data) {
           setQuizzes(quizzesResponse.data);
+          setQuizOptions(
+            quizzesResponse.data.map((quiz) => ({
+              value: quiz.id,
+              label: quiz.title,
+            }))
+          );
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
+        toast.error("Failed to load data");
       }
     };
     fetchData();
   }, []);
+
+  const searchUsers = async (searchTerm: string) => {
+    if (!searchTerm.trim()) {
+      const response = await adminApi.getAllUsers({ limit: 10 });
+      if (response.success && response.data) {
+        setUserOptions(
+          response.data.map((user) => ({
+            value: user.id,
+            label: `${user.full_name} (${user.email})`,
+          }))
+        );
+      }
+      return;
+    }
+
+    setUserSearchLoading(true);
+    try {
+      const response = await adminApi.getAllUsers({
+        searchTerm,
+        limit: 10,
+      });
+      if (response.success && response.data) {
+        setUserOptions(
+          response.data.map((user) => ({
+            value: user.id,
+            label: `${user.full_name} (${user.email})`,
+          }))
+        );
+      }
+    } catch (error) {
+      console.error("Failed to search users:", error);
+      toast.error("Failed to search users");
+    } finally {
+      setUserSearchLoading(false);
+    }
+  };
+
+  const searchQuizzes = async (searchTerm: string) => {
+    if (!searchTerm.trim()) {
+      const response = await adminApi.getAllQuizzes({ limit: 10 });
+      if (response.success && response.data) {
+        setQuizOptions(
+          response.data.map((quiz) => ({
+            value: quiz.id,
+            label: quiz.title,
+          }))
+        );
+      }
+      return;
+    }
+
+    setQuizSearchLoading(true);
+    try {
+      const response = await adminApi.getAllQuizzes({
+        searchTerm,
+        limit: 10,
+      });
+      if (response.success && response.data) {
+        setQuizOptions(
+          response.data.map((quiz) => ({
+            value: quiz.id,
+            label: quiz.title,
+          }))
+        );
+      }
+    } catch (error) {
+      console.error("Failed to search quizzes:", error);
+      toast.error("Failed to search quizzes");
+    } finally {
+      setQuizSearchLoading(false);
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -125,18 +217,16 @@ export function CertificateForm({
                 name="user_id"
                 control={control}
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select user" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {users.map((user) => (
-                        <SelectItem key={user.id} value={user.id}>
-                          {user.name} ({user.email})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Combobox
+                    options={userOptions}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    onSearch={searchUsers}
+                    placeholder="Select user"
+                    searchPlaceholder="Search users..."
+                    emptyText="No users found."
+                    loading={userSearchLoading}
+                  />
                 )}
               />
               {errors.user_id && (
@@ -152,18 +242,16 @@ export function CertificateForm({
                 name="quiz_id"
                 control={control}
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select quiz" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {quizzes.map((quiz) => (
-                        <SelectItem key={quiz.id} value={quiz.id}>
-                          {quiz.title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Combobox
+                    options={quizOptions}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    onSearch={searchQuizzes}
+                    placeholder="Select quiz"
+                    searchPlaceholder="Search quizzes..."
+                    emptyText="No quizzes found."
+                    loading={quizSearchLoading}
+                  />
                 )}
               />
               {errors.quiz_id && (

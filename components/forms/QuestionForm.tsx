@@ -13,6 +13,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { SearchableCombobox, ComboboxOption } from "@/components/ui/searchable-combobox";
+import { Combobox } from "@/components/ui/combobox";
 import { adminApi } from "@/lib/api/adminApi";
 import { Question, Quiz } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,6 +22,7 @@ import { Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
+import { toast } from "sonner";
 
 const questionSchema = z.object({
   quiz_id: z.string().min(1, "Quiz is required"),
@@ -60,6 +63,8 @@ export function QuestionForm({
   isLoading,
 }: QuestionFormProps) {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [quizOptions, setQuizOptions] = useState<ComboboxOption[]>([]);
+  const [quizSearchLoading, setQuizSearchLoading] = useState(false);
   const [questionImage, setQuestionImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(
     question?.question_image_url || null
@@ -111,16 +116,59 @@ export function QuestionForm({
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
-        const response = await adminApi.getAllQuizzes();
+        const response = await adminApi.getAllQuizzes({ limit: 10 });
         if (response.success && response.data) {
           setQuizzes(response.data);
+          setQuizOptions(
+            response.data.map((quiz) => ({
+              value: quiz.id,
+              label: quiz.title,
+            }))
+          );
         }
       } catch (error) {
         console.error("Failed to fetch quizzes:", error);
+        toast.error("Failed to load quizzes");
       }
     };
     fetchQuizzes();
   }, []);
+
+  const searchQuizzes = async (searchTerm: string) => {
+    if (!searchTerm.trim()) {
+      const response = await adminApi.getAllQuizzes({ limit: 10 });
+      if (response.success && response.data) {
+        setQuizOptions(
+          response.data.map((quiz) => ({
+            value: quiz.id,
+            label: quiz.title,
+          }))
+        );
+      }
+      return;
+    }
+
+    setQuizSearchLoading(true);
+    try {
+      const response = await adminApi.getAllQuizzes({
+        searchTerm,
+        limit: 10,
+      });
+      if (response.success && response.data) {
+        setQuizOptions(
+          response.data.map((quiz) => ({
+            value: quiz.id,
+            label: quiz.title,
+          }))
+        );
+      }
+    } catch (error) {
+      console.error("Failed to search quizzes:", error);
+      toast.error("Failed to search quizzes");
+    } finally {
+      setQuizSearchLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (questionType === "yes_no") {
@@ -209,18 +257,16 @@ export function QuestionForm({
                 name="quiz_id"
                 control={control}
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select quiz" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {quizzes.map((quiz) => (
-                        <SelectItem key={quiz.id} value={quiz.id}>
-                          {quiz.title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Combobox
+                    options={quizOptions}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    onSearch={searchQuizzes}
+                    placeholder="Select quiz"
+                    searchPlaceholder="Search quizzes..."
+                    emptyText="No quizzes found."
+                    loading={quizSearchLoading}
+                  />
                 )}
               />
               {errors.quiz_id && (

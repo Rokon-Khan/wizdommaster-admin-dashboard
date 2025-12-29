@@ -1,9 +1,8 @@
 "use client";
 
-import * as React from "react";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
+import * as React from "react";
 
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -18,6 +17,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 export interface ComboboxOption {
   value: string;
@@ -75,8 +75,8 @@ export function SearchableCombobox({
       </PopoverTrigger>
       <PopoverContent className="w-full p-0" align="start">
         <Command shouldFilter={false}>
-          <CommandInput 
-            placeholder={searchPlaceholder} 
+          <CommandInput
+            placeholder={searchPlaceholder}
             value={searchTerm}
             onValueChange={handleSearch}
           />
@@ -94,7 +94,7 @@ export function SearchableCombobox({
                       key={option.value}
                       value={option.label}
                       onSelect={() => {
-                        onValueChange?.(option.value === value ? "" : option.value);
+                        onValueChange?.(option.value);
                         setOpen(false);
                       }}
                     >
