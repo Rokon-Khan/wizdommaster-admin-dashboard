@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  BarChart3,
-  Bell,
-  FileText,
-  Settings,
-  User,
-  Users,
-} from "lucide-react";
+import { BarChart3, FileText, Settings, User, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -29,7 +22,7 @@ const navItems = [
   { icon: FileText, href: "/content", label: "Content" },
   { icon: Settings, href: "/settings", label: "Settings" },
   { icon: User, href: "/profile", label: "Profile" },
-  { icon: Bell, href: "/notifications", label: "Notifications" },
+  // { icon: Bell, href: "/notifications", label: "Notifications" },
 ];
 
 export default function AppSidebar() {
@@ -55,7 +48,8 @@ export default function AppSidebar() {
                 const Icon = item.icon;
                 const isActive =
                   pathname === item.href ||
-                  (item.href !== "/analytics" && pathname?.startsWith(item.href));
+                  (item.href !== "/analytics" &&
+                    pathname?.startsWith(item.href));
 
                 return (
                   <SidebarMenuItem key={item.href}>

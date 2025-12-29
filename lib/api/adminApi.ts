@@ -62,14 +62,10 @@ export const adminApi = {
     return authFetch(`${API_BASE_URL}/admin/categories/${id}`);
   },
 
-  async createCategory(data: {
-    name: string;
-    description?: string;
-  }): Promise<ApiResponse<Category>> {
+  async createCategory(data: FormData): Promise<ApiResponse<Category>> {
     return authFetch(`${API_BASE_URL}/admin/categories`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: data,
     });
   },
 

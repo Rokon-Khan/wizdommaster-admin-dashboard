@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { QuestionForm } from "@/components/forms/QuestionForm";
 import { questionApi } from "@/lib/api/questionApi";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 
 export default function CreateQuestionPage() {
@@ -30,9 +32,19 @@ export default function CreateQuestionPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Create Question</h1>
-        <p className="text-muted-foreground">Add a new question to your quiz</p>
+      <div className="flex items-center gap-4">
+        <Link
+          href="/content/questions"
+          className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Link>
+        <div>
+          <h1 className="text-3xl font-bold">Create Question</h1>
+          <p className="text-muted-foreground">
+            Add a new question to your quiz
+          </p>
+        </div>
       </div>
       <QuestionForm onSubmit={handleSubmit} isLoading={isLoading} />
     </div>

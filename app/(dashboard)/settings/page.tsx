@@ -17,10 +17,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { authApi } from "@/lib/api/authApi";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Bell, Globe, Lock, Palette, Save } from "lucide-react";
+import { ArrowLeft, Globe, Lock, Palette, Save } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useState } from "react";
@@ -173,7 +172,7 @@ export default function SettingsPage() {
       </Card>
 
       {/* Notifications */}
-      <Card>
+      {/* <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
             <Bell className="w-5 h-5" />
@@ -227,7 +226,7 @@ export default function SettingsPage() {
             />
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* Appearance */}
       <Card>
