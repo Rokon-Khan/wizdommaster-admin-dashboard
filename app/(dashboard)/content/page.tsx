@@ -89,7 +89,7 @@ export default function ContentPage() {
                     {section.description}
                   </p>
                   <p className="text-lg font-bold text-foreground mt-1">
-                    {section.count}
+                    {loading ? "..." : section.count}
                   </p>
                 </div>
               </div>
@@ -97,7 +97,7 @@ export default function ContentPage() {
                 <Button asChild className="flex-1">
                   <Link href={section.href}>Manage</Link>
                 </Button>
-                <Button variant="outline" size="sm" asChild>
+                <Button variant="outline" asChild>
                   <Link href={`${section.href}/create`}>
                     <Plus className="h-4 w-4" />
                   </Link>

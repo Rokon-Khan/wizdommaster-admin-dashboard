@@ -1,0 +1,49 @@
+name: Deploy Admin Dashboard to DigitalOcean
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy Admin to Production
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Deploy to DigitalOcean
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            echo "🚀 Deploying Admin Dashboard..."
+            
+            # Navigate to admin directory
+            cd /home/wizdommaster-admin
+            
+            # Pull latest changes
+            echo "📥 Pulling latest code..."
+            git pull origin main
+            
+            # Install dependencies
+            echo "📦 Installing dependencies..."
+            npm install
+            
+            # Build Next.js app
+            echo "🔨 Building application..."
+            npm run build
+            
+            # Restart PM2
+            echo "♻️ Restarting application..."
+            pm2 restart wizdom-admin || pm2 start npm --name "wizdom-admin" -- start -- -p 3001
+            
+            # Save PM2 configuration
+            pm2 save
+            
+            echo "✅ Admin Dashboard deployment complete!"
+            pm2 status
