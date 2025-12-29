@@ -6,6 +6,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Table,
   TableBody,
   TableCell,
@@ -32,6 +42,7 @@ export default function CertificatesPage() {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [certificateToDelete, setCertificateToDelete] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -80,11 +91,15 @@ export default function CertificatesPage() {
     fetchCertificates(page, searchTerm);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this certificate?")) return;
+  const handleDeleteClick = (id: string) => {
+    setCertificateToDelete(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!certificateToDelete) return;
 
     try {
-      const response = await adminApi.deleteCertificate(id);
+      const response = await adminApi.deleteCertificate(certificateToDelete);
       if (response.success) {
         toast.success("Certificate deleted successfully");
         fetchCertificates(pagination.page, searchTerm);
@@ -93,6 +108,8 @@ export default function CertificatesPage() {
       }
     } catch (error) {
       toast.error("Failed to delete certificate");
+    } finally {
+      setCertificateToDelete(null);
     }
   };
 
@@ -214,7 +231,7 @@ export default function CertificatesPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleDelete(certificate.id)}
+                        onClick={() => handleDeleteClick(certificate.id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -305,6 +322,33 @@ export default function CertificatesPage() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        open={!!certificateToDelete}
+        onOpenChange={(open) => !open && setCertificateToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              certificate and remove all associated data from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setCertificateToDelete(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete Certificate
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

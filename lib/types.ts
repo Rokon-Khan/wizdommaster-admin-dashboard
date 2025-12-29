@@ -55,6 +55,7 @@ export interface Quiz {
   time_limit_minutes: number;
   passing_score: number;
   is_published: boolean;
+  is_featured: boolean;
   created_at: string;
   updated_at: string;
   category?: {

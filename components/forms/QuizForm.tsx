@@ -31,7 +31,8 @@ const quizSchema = z.object({
   questions_per_attempt: z.number().int().positive("Must be a positive number"),
   time_limit_minutes: z.number().int().min(0, "Must be 0 or greater"),
   passing_score: z.number().int().min(0).max(100, "Must be between 0 and 100"),
-  is_published: z.boolean(),
+  is_published: z.boolean().optional(),
+  is_featured: z.boolean().optional(),
 });
 
 type QuizFormData = z.infer<typeof quizSchema>;
@@ -69,10 +70,12 @@ export function QuizForm({ quiz, onSubmit, isLoading }: QuizFormProps) {
       time_limit_minutes: quiz?.time_limit_minutes || 30,
       passing_score: quiz?.passing_score || 70,
       is_published: quiz?.is_published ?? false,
+      is_featured: quiz?.is_featured ?? false,
     },
   });
 
   const isPublished = watch("is_published");
+  const isFeatured = watch("is_featured");
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -335,7 +338,14 @@ export function QuizForm({ quiz, onSubmit, isLoading }: QuizFormProps) {
               onCheckedChange={(checked) => setValue("is_published", !!checked)}
             />
             <Label htmlFor="is_published">Published</Label>
+            <Checkbox
+              id="is_featured"
+              checked={isFeatured}
+              onCheckedChange={(checked) => setValue("is_featured", !!checked)}
+            />
+            <Label htmlFor="is_featured">Featured</Label>
           </div>
+          <div className="flex items-center space-x-2"></div>
 
           <div className="flex gap-2">
             <Button type="submit" disabled={isLoading}>
@@ -354,233 +364,3 @@ export function QuizForm({ quiz, onSubmit, isLoading }: QuizFormProps) {
     </Card>
   );
 }
-
-// "use client";
-
-// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-// import { Input } from "@/components/ui/input";
-// import { Label } from "@/components/ui/label";
-// import { SearchableCombobox } from "@/components/ui/searchable-combobox";
-// import { adminApi } from "@/lib/api/adminApi";
-// import { Category, Quiz } from "@/lib/types";
-// import { zodResolver } from "@hookform/resolvers/zod";
-// import { useEffect, useState } from "react";
-// import { Controller, useForm } from "react-hook-form";
-// import { toast } from "sonner";
-// import { z } from "zod";
-
-// interface ComboboxOption {
-//   value: string;
-//   label: string;
-// }
-
-// const quizSchema = z.object({
-//   category_id: z.string().min(1, "Category is required"),
-//   title: z.string().min(2, "Quiz title must be at least 2 characters long"),
-//   description: z.string().optional(),
-//   difficulty_level: z.enum(["easy", "medium", "hard"]),
-//   questions_per_attempt: z.number().int().positive("Must be a positive number"),
-//   time_limit_minutes: z.number().int().min(0, "Must be 0 or greater"),
-//   passing_score: z.number().int().min(0).max(100, "Must be between 0 and 100"),
-//   is_published: z.boolean(),
-// });
-
-// type QuizFormData = z.infer<typeof quizSchema>;
-
-// interface QuizFormProps {
-//   quiz?: Quiz;
-//   onSubmit: (data: FormData) => Promise<void>;
-//   isLoading?: boolean;
-// }
-
-// export function QuizForm({ quiz, onSubmit, isLoading }: QuizFormProps) {
-//   const [categories, setCategories] = useState<Category[]>([]);
-//   const [categoryOptions, setCategoryOptions] = useState<ComboboxOption[]>([]);
-//   const [categorySearchLoading, setCategorySearchLoading] = useState(false);
-//   const [thumbnail, setThumbnail] = useState<File | null>(null);
-//   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(
-//     quiz?.thumbnail_url || null
-//   );
-
-//   const {
-//     register,
-//     handleSubmit,
-//     control,
-//     setValue,
-//     watch,
-//     formState: { errors },
-//   } = useForm<QuizFormData>({
-//     resolver: zodResolver(quizSchema),
-//     defaultValues: {
-//       category_id: quiz?.category_id || "",
-//       title: quiz?.title || "",
-//       description: quiz?.description || "",
-//       difficulty_level: quiz?.difficulty_level || "easy",
-//       questions_per_attempt: quiz?.questions_per_attempt || 10,
-//       time_limit_minutes: quiz?.time_limit_minutes || 30,
-//       passing_score: quiz?.passing_score || 70,
-//       is_published: quiz?.is_published ?? false,
-//     },
-//   });
-
-//   const isPublished = watch("is_published");
-
-//   useEffect(() => {
-//     const fetchCategories = async () => {
-//       try {
-//         const response = await adminApi.getAllCategories({ limit: 50 }); // Increased limit
-//         if (response.success && response.data) {
-//           setCategories(response.data);
-//           setCategoryOptions(
-//             response.data.map((category) => ({
-//               value: category.id,
-//               label: category.name,
-//             }))
-//           );
-//         }
-//       } catch (error) {
-//         console.error("Failed to fetch categories:", error);
-//         toast.error("Failed to load categories");
-//       }
-//     };
-//     fetchCategories();
-//   }, []);
-
-//   const searchCategories = async (searchTerm: string) => {
-//     if (!searchTerm.trim()) {
-//       // Reset to all categories when search is empty
-//       setCategoryOptions(
-//         categories.map((category) => ({
-//           value: category.id,
-//           label: category.name,
-//         }))
-//       );
-//       return;
-//     }
-
-//     setCategorySearchLoading(true);
-//     try {
-//       const response = await adminApi.getAllCategories({
-//         searchTerm: searchTerm,
-//         limit: 10,
-//       });
-//       if (response.success && response.data) {
-//         setCategoryOptions(
-//           response.data.map((category) => ({
-//             value: category.id,
-//             label: category.name,
-//           }))
-//         );
-//       }
-//     } catch (error) {
-//       console.error("Failed to search categories:", error);
-//       toast.error("Failed to search categories");
-//     } finally {
-//       setCategorySearchLoading(false);
-//     }
-//   };
-
-//   // Add this effect to handle initial category selection for edit mode
-//   useEffect(() => {
-//     if (quiz?.category_id && categories.length > 0) {
-//       const category = categories.find((cat) => cat.id === quiz.category_id);
-//       if (category) {
-//         setValue("category_id", quiz.category_id);
-//       }
-//     }
-//   }, [quiz, categories, setValue]);
-
-//   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const file = e.target.files?.[0];
-//     if (file) {
-//       setThumbnail(file);
-//       const reader = new FileReader();
-//       reader.onload = () => setThumbnailPreview(reader.result as string);
-//       reader.readAsDataURL(file);
-//     }
-//   };
-
-//   const removeThumbnail = () => {
-//     setThumbnail(null);
-//     setThumbnailPreview(null);
-//   };
-
-//   const handleFormSubmit = async (data: QuizFormData) => {
-//     try {
-//       const formData = new FormData();
-
-//       Object.entries(data).forEach(([key, value]) => {
-//         if (value !== undefined && value !== null) {
-//           formData.append(key, value.toString());
-//         }
-//       });
-
-//       if (thumbnail) {
-//         formData.append("thumbnail", thumbnail);
-//       }
-
-//       await onSubmit(formData);
-//       toast.success(
-//         quiz ? "Quiz updated successfully!" : "Quiz created successfully!"
-//       );
-//     } catch (error) {
-//       toast.error(quiz ? "Failed to update quiz" : "Failed to create quiz");
-//     }
-//   };
-
-//   return (
-//     <Card>
-//       <CardHeader>
-//         <CardTitle>{quiz ? "Edit Quiz" : "Create Quiz"}</CardTitle>
-//       </CardHeader>
-//       <CardContent>
-//         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
-//           <div className="grid gap-4 md:grid-cols-2">
-//             <div className="space-y-2">
-//               <Label htmlFor="title">Title *</Label>
-//               <Input
-//                 id="title"
-//                 {...register("title")}
-//                 placeholder="Enter quiz title"
-//               />
-//               {errors.title && (
-//                 <p className="text-destructive text-sm">
-//                   {errors.title.message}
-//                 </p>
-//               )}
-//             </div>
-
-//             <div className="space-y-2">
-//               <Label htmlFor="category_id">Category *</Label>
-//               <Controller
-//                 name="category_id"
-//                 control={control}
-//                 render={({ field }) => (
-//                   <SearchableCombobox
-//                     options={categoryOptions}
-//                     value={field.value}
-//                     onValueChange={(value) => {
-//                       field.onChange(value);
-//                     }}
-//                     onSearch={searchCategories}
-//                     placeholder="Select category"
-//                     searchPlaceholder="Search categories..."
-//                     emptyText="No categories found."
-//                     loading={categorySearchLoading}
-//                   />
-//                 )}
-//               />
-//               {errors.category_id && (
-//                 <p className="text-destructive text-sm">
-//                   {errors.category_id.message}
-//                 </p>
-//               )}
-//             </div>
-//           </div>
-
-//           {/* ... rest of your form remains the same ... */}
-//         </form>
-//       </CardContent>
-//     </Card>
-//   );
-// }
