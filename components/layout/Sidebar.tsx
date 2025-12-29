@@ -3,10 +3,12 @@
 import { BarChart3, FileText, Settings, User, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ServerInfo } from "@/components/shared/ServerInfo";
 
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
@@ -70,6 +72,11 @@ export default function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter className="p-2">
+        <div className="group-data-[collapsible=icon]:hidden">
+          <ServerInfo />
+        </div>
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );
