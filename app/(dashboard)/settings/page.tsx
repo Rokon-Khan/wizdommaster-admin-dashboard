@@ -20,8 +20,9 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { authApi } from "@/lib/api/authApi";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Bell, Globe, Lock, Palette, Save } from "lucide-react";
+import { ArrowLeft, Bell, Globe, Lock, Palette, Save } from "lucide-react";
 import { useTheme } from "next-themes";
+import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -47,7 +48,7 @@ export default function SettingsPage() {
     push: false,
     sms: false,
   });
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  // const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   const {
     register,
@@ -64,7 +65,7 @@ export default function SettingsPage() {
       if (response.success) {
         toast.success("Password changed successfully");
         reset();
-        setIsChangingPassword(false);
+        // setIsChangingPassword(false);
       } else {
         toast.error(response.message || "Failed to change password");
       }
@@ -79,11 +80,19 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your account and platform preferences
-        </p>
+      <div className="flex items-center gap-4">
+        <Link
+          href="/analytics"
+          className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Link>
+        <div>
+          <h1 className="text-3xl font-bold">Settings</h1>
+          <p className="text-muted-foreground">
+            Manage your account and platform preferences
+          </p>
+        </div>
       </div>
 
       {/* Security */}
@@ -96,7 +105,7 @@ export default function SettingsPage() {
           <CardDescription>Manage your security settings</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {!isChangingPassword ? (
+          {/* {!isChangingPassword ? (
             <Button
               variant="outline"
               onClick={() => setIsChangingPassword(true)}
@@ -105,61 +114,61 @@ export default function SettingsPage() {
               <Lock className="w-4 h-4 mr-2" />
               Change Password
             </Button>
-          ) : (
-            <form
-              onSubmit={handleSubmit(handlePasswordChange)}
-              className="space-y-4"
-            >
-              <div className="space-y-2">
-                <Label htmlFor="currentPassword">Current Password</Label>
-                <PasswordInput
-                  id="currentPassword"
-                  {...register("currentPassword")}
-                />
-                {errors.currentPassword && (
-                  <p className="text-destructive text-sm">
-                    {errors.currentPassword.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="newPassword">New Password</Label>
-                <PasswordInput id="newPassword" {...register("newPassword")} />
-                {errors.newPassword && (
-                  <p className="text-destructive text-sm">
-                    {errors.newPassword.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <PasswordInput
-                  id="confirmPassword"
-                  {...register("confirmPassword")}
-                />
-                {errors.confirmPassword && (
-                  <p className="text-destructive text-sm">
-                    {errors.confirmPassword.message}
-                  </p>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Changing..." : "Change Password"}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setIsChangingPassword(false);
-                    reset();
-                  }}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </form>
-          )}
+          ) : ( */}
+          <form
+            onSubmit={handleSubmit(handlePasswordChange)}
+            className="space-y-4"
+          >
+            <div className="space-y-2">
+              <Label htmlFor="currentPassword">Current Password</Label>
+              <PasswordInput
+                id="currentPassword"
+                {...register("currentPassword")}
+              />
+              {errors.currentPassword && (
+                <p className="text-destructive text-sm">
+                  {errors.currentPassword.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="newPassword">New Password</Label>
+              <PasswordInput id="newPassword" {...register("newPassword")} />
+              {errors.newPassword && (
+                <p className="text-destructive text-sm">
+                  {errors.newPassword.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <PasswordInput
+                id="confirmPassword"
+                {...register("confirmPassword")}
+              />
+              {errors.confirmPassword && (
+                <p className="text-destructive text-sm">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Changing..." : "Change Password"}
+              </Button>
+              {/* <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setIsChangingPassword(false);
+                  reset();
+                }}
+              >
+                Cancel
+              </Button> */}
+            </div>
+          </form>
+          {/* )} */}
         </CardContent>
       </Card>
 

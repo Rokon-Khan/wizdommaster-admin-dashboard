@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { questionApi } from "@/lib/api/questionApi";
 import { Question } from "@/lib/types";
-import { Edit, Eye, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Edit, Eye, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -182,11 +182,19 @@ export default function QuestionsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Questions</h1>
-          <p className="text-muted-foreground">
-            Manage quiz questions and answers
-          </p>
+        <div className="flex items-center gap-4">
+          <Link
+            href="/content"
+            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          <div>
+            <h1 className="text-3xl font-bold">Questions</h1>
+            <p className="text-muted-foreground">
+              Manage quiz questions and answers
+            </p>
+          </div>
         </div>
         <Button asChild>
           <Link href="/content/questions/create">

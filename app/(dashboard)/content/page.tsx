@@ -3,7 +3,14 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import { adminApi } from "@/lib/api/adminApi";
 import { Analytics } from "@/lib/types";
-import { File, FileText, FolderOpen, HelpCircle, Plus } from "lucide-react";
+import {
+  ArrowLeft,
+  File,
+  FileText,
+  FolderOpen,
+  HelpCircle,
+  Plus,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 // import { Analytics } from "@/lib/types";
@@ -67,11 +74,19 @@ export default function ContentPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Content Management</h1>
-        <p className="text-muted-foreground">
-          Manage your quiz content, categories, and questions
-        </p>
+      <div className="flex items-center gap-4">
+        <Link
+          href="/analytics"
+          className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Link>
+        <div>
+          <h1 className="text-3xl font-bold">Content Management</h1>
+          <p className="text-muted-foreground">
+            Manage your quiz content, categories, and questions
+          </p>
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

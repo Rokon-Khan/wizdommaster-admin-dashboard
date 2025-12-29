@@ -178,7 +178,7 @@ export default function ProfilePage() {
                           : "destructive"
                       }
                     >
-                      {currentUser.is_active}
+                      {currentUser.is_active === true ? "Active" : "Inactive"}
                     </Badge>
                   </div>
                   {/* <div>

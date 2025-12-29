@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { adminApi } from "@/lib/api/adminApi";
 import { Quiz } from "@/lib/types";
-import { Edit, Eye, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Edit, Eye, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -185,11 +185,19 @@ export default function QuizzesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Quizzes</h1>
-          <p className="text-muted-foreground">
-            Manage quiz content and settings
-          </p>
+        <div className="flex items-center gap-4">
+          <Link
+            href="/content"
+            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          <div>
+            <h1 className="text-3xl font-bold">Quizzes</h1>
+            <p className="text-muted-foreground">
+              Manage quiz content and settings
+            </p>
+          </div>
         </div>
         <Button asChild>
           <Link href="/content/quizzes/create">
