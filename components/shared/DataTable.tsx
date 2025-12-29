@@ -217,58 +217,6 @@ export function DataTable<T extends Record<string, any>>({
     ? Math.ceil(pagination.total / pagination.limit)
     : 1;
 
-  // Skeleton loading state - returns full skeleton UI
-  if (loading) {
-    return (
-      <Card className="p-6">
-        {/* Search skeleton */}
-        {onSearch && (
-          <div className="mb-4">
-            <Skeleton className="h-10 w-full" />
-          </div>
-        )}
-
-        {/* Table skeleton */}
-        <div className="rounded-md border">
-          <div className="border-b px-4 py-3">
-            <div className="flex gap-4">
-              {columns.map((_, index) => (
-                <Skeleton key={index} className="h-4 flex-1" />
-              ))}
-            </div>
-          </div>
-          <div className="p-4">
-            <div className="space-y-3">
-              {[...Array(5)].map((_, rowIndex) => (
-                <div key={rowIndex} className="flex gap-4">
-                  {columns.map((_, colIndex) => (
-                    <Skeleton key={colIndex} className="h-4 flex-1" />
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Pagination skeleton */}
-        {pagination && (
-          <div className="flex items-center justify-between space-x-2 py-4">
-            <Skeleton className="h-4 w-48" />
-            <div className="flex items-center space-x-2">
-              <Skeleton className="h-9 w-24" />
-              <div className="flex items-center space-x-1">
-                {[...Array(Math.min(5, totalPages))].map((_, i) => (
-                  <Skeleton key={i} className="h-9 w-9" />
-                ))}
-              </div>
-              <Skeleton className="h-9 w-24" />
-            </div>
-          </div>
-        )}
-      </Card>
-    );
-  }
-
   return (
     <Card className="p-6">
       {/* Search */}
@@ -297,7 +245,18 @@ export function DataTable<T extends Record<string, any>>({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.length === 0 ? (
+            {loading ? (
+              // Show skeleton rows instead of full page skeleton
+              [...Array(5)].map((_, rowIndex) => (
+                <TableRow key={rowIndex}>
+                  {columns.map((_, colIndex) => (
+                    <TableCell key={colIndex}>
+                      <Skeleton className="h-4 w-full" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : data.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={columns.length}

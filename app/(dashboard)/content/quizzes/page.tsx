@@ -3,16 +3,28 @@
 import { DataTable } from "@/components/shared/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { adminApi } from "@/lib/api/adminApi";
 import { Quiz } from "@/lib/types";
 import { ArrowLeft, Edit, Eye, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function QuizzesPage() {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
+  const [quizToDelete, setQuizToDelete] = useState<string | null>(null);
   const router = useRouter();
   const [pagination, setPagination] = useState({
     page: 1,
@@ -26,12 +38,13 @@ export default function QuizzesPage() {
       const response = await adminApi.getAllQuizzes({
         page,
         limit: pagination.limit,
+        searchTerm: search || undefined,
       });
       if (response.success && response.data) {
         setQuizzes(response.data);
         setPagination((prev) => ({
           ...prev,
-          page,
+          page: response.meta?.page || 1,
           total: response.meta?.total || 0,
         }));
       }
@@ -62,20 +75,26 @@ export default function QuizzesPage() {
     router.push(`/content/quizzes/${id}/edit`);
   };
 
-  const handleDelete = async (id: string) => {
-    if (
-      confirm(
-        "Are you sure you want to delete this quiz? This action cannot be undone."
-      )
-    ) {
-      try {
-        const response = await adminApi.deleteQuiz(id);
-        if (response.success) {
-          fetchQuizzes();
-        }
-      } catch (error) {
-        console.error("Failed to delete quiz:", error);
+  const handleDeleteClick = (id: string) => {
+    setQuizToDelete(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!quizToDelete) return;
+
+    try {
+      const response = await adminApi.deleteQuiz(quizToDelete);
+      if (response.success) {
+        toast.success("Quiz deleted successfully");
+        fetchQuizzes();
+      } else {
+        toast.error("Failed to delete quiz");
       }
+    } catch (error) {
+      console.error("Failed to delete quiz:", error);
+      toast.error("Failed to delete quiz");
+    } finally {
+      setQuizToDelete(null);
     }
   };
 
@@ -173,7 +192,7 @@ export default function QuizzesPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => handleDelete(quiz.id)}
+            onClick={() => handleDeleteClick(quiz.id)}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -218,6 +237,33 @@ export default function QuizzesPage() {
         onSearch={handleSearch}
         loading={loading}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        open={!!quizToDelete}
+        onOpenChange={(open) => !open && setQuizToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              quiz and all associated questions and data from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setQuizToDelete(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete Quiz
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -32,7 +32,7 @@ export default function QuestionsPage() {
         setQuestions(response?.data);
         setPagination((prev) => ({
           ...prev,
-          page,
+          page: response.meta?.page || 1,
           total: response.meta?.total || 0,
         }));
       }

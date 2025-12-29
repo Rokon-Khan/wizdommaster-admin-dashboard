@@ -11,9 +11,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Combobox, ComboboxOption } from "@/components/ui/combobox";
+import { SearchableCombobox } from "@/components/ui/searchable-combobox";
 import { Quiz, Category } from "@/lib/types";
 import { adminApi } from "@/lib/api/adminApi";
 import { Upload, X } from "lucide-react";
+import { toast } from "sonner";
 
 const quizSchema = z.object({
   category_id: z.string().min(1, "Category is required"),
@@ -36,6 +39,8 @@ interface QuizFormProps {
 
 export function QuizForm({ quiz, onSubmit, isLoading }: QuizFormProps) {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<ComboboxOption[]>([]);
+  const [categorySearchLoading, setCategorySearchLoading] = useState(false);
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(
     quiz?.thumbnail_url || null
@@ -67,16 +72,60 @@ export function QuizForm({ quiz, onSubmit, isLoading }: QuizFormProps) {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await adminApi.getAllCategories();
+        const response = await adminApi.getAllCategories({ limit: 10 });
         if (response.success && response.data) {
           setCategories(response.data);
+          setCategoryOptions(
+            response.data.map((category) => ({
+              value: category.id,
+              label: category.name,
+            }))
+          );
         }
       } catch (error) {
         console.error("Failed to fetch categories:", error);
+        toast.error("Failed to load categories");
       }
     };
     fetchCategories();
   }, []);
+
+  const searchCategories = async (searchTerm: string) => {
+    if (!searchTerm.trim()) {
+      // Reset to initial categories when search is empty
+      const response = await adminApi.getAllCategories({ limit: 10 });
+      if (response.success && response.data) {
+        setCategoryOptions(
+          response.data.map((category) => ({
+            value: category.id,
+            label: category.name,
+          }))
+        );
+      }
+      return;
+    }
+
+    setCategorySearchLoading(true);
+    try {
+      const response = await adminApi.getAllCategories({
+        searchTerm,
+        limit: 10,
+      });
+      if (response.success && response.data) {
+        setCategoryOptions(
+          response.data.map((category) => ({
+            value: category.id,
+            label: category.name,
+          }))
+        );
+      }
+    } catch (error) {
+      console.error("Failed to search categories:", error);
+      toast.error("Failed to search categories");
+    } finally {
+      setCategorySearchLoading(false);
+    }
+  };
 
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -94,19 +143,24 @@ export function QuizForm({ quiz, onSubmit, isLoading }: QuizFormProps) {
   };
 
   const handleFormSubmit = async (data: QuizFormData) => {
-    const formData = new FormData();
-    
-    Object.entries(data).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        formData.append(key, value.toString());
+    try {
+      const formData = new FormData();
+      
+      Object.entries(data).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          formData.append(key, value.toString());
+        }
+      });
+
+      if (thumbnail) {
+        formData.append("thumbnail", thumbnail);
       }
-    });
 
-    if (thumbnail) {
-      formData.append("thumbnail", thumbnail);
+      await onSubmit(formData);
+      toast.success(quiz ? "Quiz updated successfully!" : "Quiz created successfully!");
+    } catch (error) {
+      toast.error(quiz ? "Failed to update quiz" : "Failed to create quiz");
     }
-
-    await onSubmit(formData);
   };
 
   return (
@@ -135,18 +189,16 @@ export function QuizForm({ quiz, onSubmit, isLoading }: QuizFormProps) {
                 name="category_id"
                 control={control}
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <SearchableCombobox
+                    options={categoryOptions}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    onSearch={searchCategories}
+                    placeholder="Select category"
+                    searchPlaceholder="Search categories..."
+                    emptyText="No categories found."
+                    loading={categorySearchLoading}
+                  />
                 )}
               />
               {errors.category_id && (

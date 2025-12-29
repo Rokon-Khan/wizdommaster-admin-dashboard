@@ -3,16 +3,28 @@
 import { DataTable } from "@/components/shared/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { adminApi } from "@/lib/api/adminApi";
 import { Category } from "@/lib/types";
 import { ArrowLeft, Edit, Eye, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
   const router = useRouter();
   const [pagination, setPagination] = useState({
     page: 1,
@@ -23,12 +35,16 @@ export default function CategoriesPage() {
   const fetchCategories = async (page = 1, search = "") => {
     setLoading(true);
     try {
-      const response = await adminApi.getAllCategories();
+      const response = await adminApi.getAllCategories({
+        page,
+        limit: pagination.limit,
+        searchTerm: search || undefined,
+      });
       if (response.success && response.data) {
         setCategories(response.data);
         setPagination((prev) => ({
           ...prev,
-          page,
+          page: response.meta?.page || 1,
           total: response.meta?.total || 0,
         }));
       }
@@ -59,16 +75,26 @@ export default function CategoriesPage() {
     router.push(`/content/categories/${id}/edit`);
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this category?")) {
-      try {
-        const response = await adminApi.deleteCategory(id);
-        if (response.success) {
-          fetchCategories();
-        }
-      } catch (error) {
-        console.error("Failed to delete category:", error);
+  const handleDeleteClick = (id: string) => {
+    setCategoryToDelete(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!categoryToDelete) return;
+
+    try {
+      const response = await adminApi.deleteCategory(categoryToDelete);
+      if (response.success) {
+        toast.success("Category deleted successfully");
+        fetchCategories();
+      } else {
+        toast.error("Failed to delete category");
       }
+    } catch (error) {
+      console.error("Failed to delete category:", error);
+      toast.error("Failed to delete category");
+    } finally {
+      setCategoryToDelete(null);
     }
   };
 
@@ -138,7 +164,7 @@ export default function CategoriesPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => handleDelete(category.id)}
+            onClick={() => handleDeleteClick(category.id)}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -182,6 +208,33 @@ export default function CategoriesPage() {
         onSearch={handleSearch}
         loading={loading}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        open={!!categoryToDelete}
+        onOpenChange={(open) => !open && setCategoryToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              category and may affect associated quizzes and questions.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setCategoryToDelete(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete Category
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
