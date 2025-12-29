@@ -12,7 +12,7 @@ export default function CreateCategoryPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (data: FormData) => {
+  const handleSubmit = async (data: any) => {
     setIsLoading(true);
     try {
       const response = await adminApi.createCategory(data);

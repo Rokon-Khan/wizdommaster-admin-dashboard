@@ -25,7 +25,7 @@ type CategoryFormData = z.infer<typeof categorySchema>;
 
 interface CategoryFormProps {
   category?: Category;
-  onSubmit: (data: FormData) => Promise<void>;
+  onSubmit: (data: any) => Promise<void>;
   isLoading?: boolean;
 }
 
@@ -71,19 +71,19 @@ export function CategoryForm({ category, onSubmit, isLoading }: CategoryFormProp
   };
 
   const handleFormSubmit = async (data: CategoryFormData) => {
-    const formData = new FormData();
+    const payload: any = {
+      name: data.name,
+      display_order: data.display_order,
+      is_active: data.is_active,
+    };
     
-    formData.append("name", data.name);
-    if (data.description) formData.append("description", data.description);
-    if (data.icon_url && !iconFile) formData.append("icon_url", data.icon_url);
-    formData.append("display_order", data.display_order.toString());
-    formData.append("is_active", data.is_active.toString());
+    if (data.description) payload.description = data.description;
+    if (data.icon_url && !iconFile) payload.icon_url = data.icon_url;
     
-    if (iconFile) {
-      formData.append("icon", iconFile);
-    }
-
-    await onSubmit(formData);
+    // For now, we'll handle file upload separately if needed
+    // The backend validation expects JSON, not FormData
+    
+    await onSubmit(payload);
   };
 
   return (
